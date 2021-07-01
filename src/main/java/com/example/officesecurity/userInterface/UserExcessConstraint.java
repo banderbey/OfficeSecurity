@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserExcessConstraint {
-    String message() default "Invalid phone number";
+    String message() default "Invalid userName";
 
     Class<?>[] groups() default {};
 

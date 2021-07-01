@@ -1,26 +1,20 @@
 package com.example.officesecurity.model;
 
-
-import com.example.officesecurity.userInterface.UserExcessConstraint;
+import com.example.officesecurity.enums.Status;
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
+import java.time.LocalDateTime;
 @Data
-@Entity // This tells Hibernate to make a table out of this class
-
-public class UserDAO {
-
-
-    @UserExcessConstraint
+@Entity
+public class EventEntity {
     private String userName;
-    private boolean loggedIn;
-    // private String password;
+    private Status event;
+    private LocalDateTime eventTime;
+
     @Id
     @GeneratedValue
     private Integer id;
-
-
 }
