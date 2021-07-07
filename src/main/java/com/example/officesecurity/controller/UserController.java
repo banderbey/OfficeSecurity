@@ -47,8 +47,8 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final TimeRepository timeRepository;
-    @Autowired
-    public FileService fileService;
+    //@Autowired
+  //  public FileService fileService;
 
 
     @PostMapping(path = "/users/register")
@@ -115,9 +115,9 @@ public class UserController {
         return userDAOList;
     }
 
-    @GetMapping(path = "getCSVFile1/userDAO.csv")
+    @GetMapping(path = "/saveFileSyncWithUUID")
 
-    public ResponseEntity<InputStreamResource> downloadCsv1() throws IOException {
+    public ResponseEntity<InputStreamResource> downloadCsvWithUUID() throws IOException {
         List<UserDAO> dataLines = userRepository.findAll();
         UUID fileId = UUID.randomUUID();
         File csvOutputFile = new File(String.format("%s.csv", fileId));
@@ -144,7 +144,7 @@ public class UserController {
 
         UUID fileId = UUID.randomUUID();
 
-        fileService.saveFile(fileId);
+       // fileService.saveFile(fileId);
         return ResponseEntity.ok(fileId.toString());
 
     }
