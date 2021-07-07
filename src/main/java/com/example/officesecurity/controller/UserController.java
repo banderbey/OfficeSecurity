@@ -1,10 +1,8 @@
 package com.example.officesecurity.controller;
 
 
-import com.example.officesecurity.csv.AsyncFile;
 import com.example.officesecurity.csv.CSVUtils;
 import com.example.officesecurity.csv.FileService;
-import com.example.officesecurity.model.CsvUserDAO;
 import com.example.officesecurity.model.EventEntity;
 import com.example.officesecurity.model.ResponseMessage;
 import com.example.officesecurity.model.UserDAO;
@@ -12,31 +10,22 @@ import com.example.officesecurity.repository.TimeRepository;
 import com.example.officesecurity.repository.UserRepository;
 import com.example.officesecurity.service.UserService;
 import com.example.officesecurity.service.impl.UserDTO;
-import javassist.bytecode.ByteArray;
 import lombok.RequiredArgsConstructor;
 
 
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController // This means that this class is a RestController
 @RequiredArgsConstructor// This means to get the bean called userRepository
@@ -47,6 +36,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final TimeRepository timeRepository;
+    private final FileService fileService;
     //@Autowired
   //  public FileService fileService;
 
@@ -135,18 +125,25 @@ public class UserController {
 
         InputStreamResource isr = new InputStreamResource(new FileInputStream(csvOutputFile));
         return new ResponseEntity<>(isr, respHeaders, HttpStatus.OK);
-
-
     }
+
     @GetMapping(path = "storeFileAsync")
-
     public ResponseEntity<String> creatAndStoreUUIDForAsyncFile() throws IOException {
-
         UUID fileId = UUID.randomUUID();
-
-       // fileService.saveFile(fileId);
+        fileService.saveAsyncFile(fileId);
         return ResponseEntity.ok(fileId.toString());
+    }
 
+    @GetMapping(path = "getFileAsync")
+    public ResponseEntity<InputStreamResource> getAsyncFile(@RequestParam String fileId) throws IOException, ExecutionException, InterruptedException {
+        File file = CompletableFuture.completedFuture(fileService.getAsyncFile(UUID.fromString(fileId))).get();
+
+        HttpHeaders respHeaders = new HttpHeaders();
+        respHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        respHeaders.setContentDispositionFormData("attachment", file.getPath());
+
+        InputStreamResource isr = new InputStreamResource(new FileInputStream(file));
+        return new ResponseEntity<>(isr, respHeaders, HttpStatus.OK);
     }
 
 

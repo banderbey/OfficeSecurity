@@ -1,7 +1,9 @@
 package com.example.officesecurity.csv;
 
+import java.io.File;
 import java.util.UUID;
 
 public interface FileService {
-    void saveFile(UUID fileId);
+    void saveAsyncFile(UUID fileId);
+    File getAsyncFile(UUID fileId);
 }
